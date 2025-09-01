@@ -1,4 +1,4 @@
-# Human Voice Assistant
+# Pdf/Text file reader Assistant
 
 A professional audio streaming application that converts uploaded documents (PDF/TXT) to speech using WebSocket-based real-time streaming.
 
