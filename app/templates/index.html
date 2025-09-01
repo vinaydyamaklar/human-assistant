@@ -1,44 +1,125 @@
-.ipynb_checkpoints/
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>TAU Voice Assistant Demo</title>
+    <style>
+        body { font-family: sans-serif; text-align: center; margin-top: 50px; }
+        button { font-size: 1.2em; padding: 10px 20px; cursor: pointer; }
+        .log-container { margin-top: 30px; border: 1px solid #ccc; padding: 20px; max-width: 600px; margin-left: auto; margin-right: auto; text-align: left; }
+    </style>
+</head>
+<body>
+    <h1>Human Voice Assistant Demo</h1>
+    <hr>
+    
+    <h2>PDF Reader Demo</h2>
+    <input type="file" id="pdfFile" accept=".pdf">
+    <button id="uploadPdfButton">Upload & Process PDF</button>
+    <button id="streamAudioButton" disabled>Stream Audio</button>
+    
+    <div class="log-container" style="margin-top: 20px;">
+        <h3>PDF Status:</h3>
+        <p id="pdfStatus">Awaiting file upload...</p>
+        <p><strong>File Name:</strong> <span id="uploadedFileName">...</span></p>
+    </div>
 
-.idea/
+    <script>
+        const API_URL = "http://localhost:8000";
 
-# Byte-compiled / optimized / DLL files
-__pycache__/
-*.py[cod]
-*$py.class
+        // PDF functionality
+        const pdfFileEl = document.getElementById('pdfFile');
+        const uploadPdfButton = document.getElementById('uploadPdfButton');
+        const streamAudioButton = document.getElementById('streamAudioButton');
+        const pdfStatusEl = document.getElementById('pdfStatus');
+        const uploadedFileNameEl = document.getElementById('uploadedFileName');
+        
+        let uploadedFileName = '';
 
-# C extensions
-*.so
+        // Add event listener for PDF upload
+        if (uploadPdfButton) {
+            uploadPdfButton.addEventListener('click', async () => {
+                const file = pdfFileEl.files[0];
+                if (!file) {
+                    pdfStatusEl.textContent = "Please select a file first.";
+                    return;
+                }
+                
+                pdfStatusEl.textContent = "Uploading...";
+                
+                const formData = new FormData();
+                formData.append('file', file);
+                
+                try {
+                    const response = await fetch(`${API_URL}/upload_file/`, {
+                        method: 'POST',
+                        body: formData,
+                    });
+                    const result = await response.json();
+                    
+                    if (result.status === 'success') {
+                        uploadedFileName = result.file_name;
+                        pdfStatusEl.textContent = `File "${uploadedFileName}" uploaded successfully!`;
+                        uploadedFileNameEl.textContent = uploadedFileName;
+                        streamAudioButton.disabled = false;
+                    } else {
+                        pdfStatusEl.textContent = `Error: ${result.message}`;
+                        streamAudioButton.disabled = true;
+                    }
+                } catch (error) {
+                    pdfStatusEl.textContent = "An error occurred during upload.";
+                    console.error("Upload error:", error);
+                    streamAudioButton.disabled = true;
+                }
+            });
+        }
 
-# Distribution / packaging
-.Python
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-share/python-wheels/
-*.egg-info/
-.installed.cfg
-*.egg
-MANIFEST
+        // Add event listener for audio streaming
+        if (streamAudioButton) {
+            streamAudioButton.addEventListener('click', async () => {
+                if (!uploadedFileName) {
+                    pdfStatusEl.textContent = "No file has been uploaded.";
+                    return;
+                }
+                
+                pdfStatusEl.textContent = "Streaming audio...";
+                streamAudioButton.disabled = true;
+                
+                try {
+                    const response = await fetch(`${API_URL}/stream_audio_from_file/`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ text: uploadedFileName }),
+                    });
+                    
+                    if (response.ok) {
+                        const audioBlob = await response.blob();
+                        const audioUrl = URL.createObjectURL(audioBlob);
+                        const audio = new Audio(audioUrl);
+                        audio.play();
+                        
+                        audio.onended = () => {
+                            pdfStatusEl.textContent = "Streaming complete.";
+                            streamAudioButton.disabled = false;
+                        };
+                    } else {
+                        const error = await response.json();
+                        pdfStatusEl.textContent = `Streaming error: ${error.message}`;
+                        streamAudioButton.disabled = false;
+                    }
+                } catch (error) {
+                    pdfStatusEl.textContent = "An error occurred during streaming.";
+                    console.error("Streaming error:", error);
+                    streamAudioButton.disabled = false;
+                }
+            });
+        }
 
-
-# PEP 582; used by e.g. github.com/David-OConnor/pyflow and github.com/pdm-project/pdm
-__pypackages__/
-
-# Environments
-.env
-.venv
-env/
-venv/
-ENV/
-env.bak/
-venv.bak/
+        // Debug logging to help troubleshoot
+        console.log('Page loaded, elements found:', {
+            uploadPdfButton: !!uploadPdfButton,
+            streamAudioButton: !!streamAudioButton
+        });
+    </script>
+</body>
+</html>
