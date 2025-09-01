@@ -2,124 +2,1407 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>TAU Voice Assistant Demo</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Human Voice Assistant - Professional Audio Streaming</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: sans-serif; text-align: center; margin-top: 50px; }
-        button { font-size: 1.2em; padding: 10px 20px; cursor: pointer; }
-        .log-container { margin-top: 30px; border: 1px solid #ccc; padding: 20px; max-width: 600px; margin-left: auto; margin-right: auto; text-align: left; }
+        :root {
+            --primary-color: #6366f1;
+            --primary-dark: #4f46e5;
+            --primary-light: #818cf8;
+            --secondary-color: #f59e0b;
+            --secondary-dark: #d97706;
+            --success-color: #10b981;
+            --error-color: #ef4444;
+            --warning-color: #f59e0b;
+            --info-color: #3b82f6;
+            
+            --bg-primary: #ffffff;
+            --bg-secondary: #f8fafc;
+            --bg-tertiary: #f1f5f9;
+            --bg-dark: #1e293b;
+            --bg-darker: #0f172a;
+            
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --text-muted: #94a3b8;
+            --text-light: #ffffff;
+            
+            --border-color: #e2e8f0;
+            --border-light: #f1f5f9;
+            --border-dark: #334155;
+            
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+            --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+            
+            --radius-sm: 0.375rem;
+            --radius-md: 0.5rem;
+            --radius-lg: 0.75rem;
+            --radius-xl: 1rem;
+            
+            --spacing-xs: 0.25rem;
+            --spacing-sm: 0.5rem;
+            --spacing-md: 1rem;
+            --spacing-lg: 1.5rem;
+            --spacing-xl: 2rem;
+            --spacing-2xl: 3rem;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body { 
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-tertiary) 100%);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+            font-weight: 400;
+        }
+        
+        .container {
+            display: flex;
+            min-height: 100vh;
+            background: var(--bg-primary);
+            box-shadow: var(--shadow-xl);
+        }
+        
+        /* Sidebar Styles */
+        .sidebar {
+            width: 320px;
+            background: linear-gradient(180deg, var(--bg-dark) 0%, var(--bg-darker) 100%);
+            color: var(--text-light);
+            padding: var(--spacing-xl);
+            box-shadow: var(--shadow-lg);
+            position: relative;
+            overflow-y: auto;
+        }
+        
+        .sidebar::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+        }
+        
+        .sidebar h2 {
+            margin-bottom: var(--spacing-xl);
+            color: var(--text-light);
+            font-weight: 600;
+            font-size: 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+        }
+        
+        .sidebar h2::before {
+            content: '📁';
+            font-size: 1.5rem;
+        }
+        
+        .refresh-btn {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: var(--text-light);
+            border: none;
+            padding: var(--spacing-md) var(--spacing-lg);
+            border-radius: var(--radius-lg);
+            cursor: pointer;
+            font-size: 0.875rem;
+            font-weight: 500;
+            margin-bottom: var(--spacing-xl);
+            width: 100%;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--spacing-sm);
+            box-shadow: var(--shadow-md);
+        }
+        
+        .refresh-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+            background: linear-gradient(135deg, var(--primary-dark), var(--primary-color));
+        }
+        
+        .refresh-btn:active {
+            transform: translateY(0);
+        }
+        
+        .file-list {
+            list-style: none;
+            margin-bottom: var(--spacing-xl);
+        }
+        
+        .file-item {
+            padding: var(--spacing-md) var(--spacing-lg);
+            margin: var(--spacing-sm) 0;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: var(--radius-lg);
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid transparent;
+            backdrop-filter: blur(10px);
+        }
+        
+        .file-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateX(4px);
+            border-color: var(--primary-light);
+        }
+        
+        .file-item.selected {
+            background: linear-gradient(135deg, var(--secondary-color), var(--secondary-dark));
+            border-color: var(--secondary-color);
+            box-shadow: var(--shadow-md);
+        }
+        
+        .file-item .file-name {
+            font-weight: 500;
+            margin-bottom: var(--spacing-xs);
+            color: var(--text-light);
+            font-size: 0.875rem;
+        }
+        
+        .file-item .file-type {
+            font-size: 0.75rem;
+            opacity: 0.8;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .no-files {
+            text-align: center;
+            color: var(--text-muted);
+            font-style: italic;
+            padding: var(--spacing-xl);
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: var(--radius-lg);
+            border: 1px dashed rgba(255, 255, 255, 0.1);
+        }
+        
+        /* Main Content Styles */
+        .main-content {
+            flex: 1;
+            padding: var(--spacing-2xl);
+            background: var(--bg-primary);
+            overflow-y: auto;
+        }
+        
+        .main-content h1 {
+            color: var(--text-primary);
+            margin-bottom: var(--spacing-2xl);
+            text-align: center;
+            font-weight: 700;
+            font-size: 2.5rem;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .upload-section {
+            background: var(--bg-secondary);
+            padding: var(--spacing-2xl);
+            border-radius: var(--radius-xl);
+            margin-bottom: var(--spacing-2xl);
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow-md);
+        }
+        
+        .upload-section h2 {
+            color: var(--text-primary);
+            margin-bottom: var(--spacing-xl);
+            font-weight: 600;
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+        }
+        
+        .upload-section h2::before {
+            content: '📤';
+            font-size: 1.75rem;
+        }
+        
+        .file-input-container {
+            margin-bottom: var(--spacing-xl);
+        }
+        
+        .file-input {
+            padding: var(--spacing-lg);
+            border: 2px dashed var(--border-color);
+            border-radius: var(--radius-lg);
+            width: 100%;
+            margin-bottom: var(--spacing-lg);
+            background: var(--bg-primary);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+        
+        .file-input:hover {
+            border-color: var(--primary-color);
+            background: var(--bg-secondary);
+        }
+        
+        .file-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+        
+        .upload-btn {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: var(--text-light);
+            border: none;
+            padding: var(--spacing-md) var(--spacing-xl);
+            border-radius: var(--radius-lg);
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 500;
+            margin-right: var(--spacing-lg);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: var(--shadow-md);
+        }
+        
+        .upload-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+            background: linear-gradient(135deg, var(--primary-dark), var(--primary-color));
+        }
+        
+        .stream-btn {
+            background: linear-gradient(135deg, var(--success-color), #059669);
+            color: var(--text-light);
+            border: none;
+            padding: var(--spacing-md) var(--spacing-xl);
+            border-radius: var(--radius-lg);
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 500;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: var(--shadow-md);
+        }
+        
+        .stream-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+            background: linear-gradient(135deg, #059669, var(--success-color));
+        }
+        
+        .stream-btn:disabled {
+            background: var(--text-muted);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        /* Status Container */
+        .status-container {
+            background: var(--bg-primary);
+            padding: var(--spacing-xl);
+            border-radius: var(--radius-xl);
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow-md);
+        }
+        
+        .status-container h3 {
+            color: var(--text-primary);
+            margin-bottom: var(--spacing-lg);
+            font-weight: 600;
+            font-size: 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+        }
+        
+        .status-container h3::before {
+            content: '📊';
+            font-size: 1.5rem;
+        }
+        
+        .status-text {
+            padding: var(--spacing-md);
+            background: var(--bg-secondary);
+            border-radius: var(--radius-lg);
+            margin: var(--spacing-md) 0;
+            border-left: 4px solid var(--info-color);
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+        
+        /* Progress Container */
+        .progress-container {
+            margin: var(--spacing-lg) 0;
+            display: none;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 12px;
+            background: var(--bg-tertiary);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            margin: var(--spacing-md) 0;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            border-radius: var(--radius-lg);
+            transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .progress-text {
+            text-align: center;
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+        
+        .current-sentence {
+            background: linear-gradient(135deg, #ecfdf5, #d1fae5);
+            padding: var(--spacing-md);
+            border-radius: var(--radius-lg);
+            margin: var(--spacing-md) 0;
+            border-left: 4px solid var(--success-color);
+            font-style: italic;
+            display: none;
+            color: var(--text-primary);
+            font-size: 0.875rem;
+        }
+        
+        .websocket-status {
+            background: linear-gradient(135deg, #fef3c7, #fde68a);
+            padding: var(--spacing-md);
+            border-radius: var(--radius-lg);
+            margin: var(--spacing-md) 0;
+            border-left: 4px solid var(--warning-color);
+            display: none;
+            color: var(--text-primary);
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+        
+        /* Audio Controls */
+        .audio-controls {
+            background: linear-gradient(135deg, var(--bg-secondary), var(--bg-tertiary));
+            padding: var(--spacing-2xl);
+            border-radius: var(--radius-xl);
+            margin: var(--spacing-xl) 0;
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow-lg);
+            display: none;
+        }
+        
+        .audio-controls h3 {
+            color: var(--text-primary);
+            margin-bottom: var(--spacing-xl);
+            text-align: center;
+            font-weight: 600;
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--spacing-sm);
+        }
+        
+        .audio-controls h3::before {
+            content: '🎵';
+            font-size: 1.75rem;
+        }
+        
+        .control-buttons {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: var(--spacing-lg);
+            margin-bottom: var(--spacing-xl);
+        }
+        
+        .control-btn {
+            background: linear-gradient(135deg, var(--bg-dark), var(--bg-darker));
+            color: var(--text-light);
+            border: none;
+            padding: var(--spacing-md);
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.25rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: var(--shadow-md);
+        }
+        
+        .control-btn:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .control-btn:disabled {
+            background: var(--text-muted);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .control-btn.play {
+            background: linear-gradient(135deg, var(--success-color), #059669);
+        }
+        
+        .control-btn.play:hover {
+            background: linear-gradient(135deg, #059669, var(--success-color));
+        }
+        
+        .control-btn.pause {
+            background: linear-gradient(135deg, var(--warning-color), var(--secondary-dark));
+        }
+        
+        .control-btn.pause:hover {
+            background: linear-gradient(135deg, var(--secondary-dark), var(--warning-color));
+        }
+        
+        .control-btn.stop {
+            background: linear-gradient(135deg, var(--error-color), #dc2626);
+        }
+        
+        .control-btn.stop:hover {
+            background: linear-gradient(135deg, #dc2626, var(--error-color));
+        }
+        
+        /* Seek Container */
+        .seek-container {
+            margin: var(--spacing-xl) 0;
+        }
+        
+        .seek-bar {
+            width: 100%;
+            height: 8px;
+            background: var(--bg-tertiary);
+            border-radius: var(--radius-lg);
+            cursor: pointer;
+            position: relative;
+            margin: var(--spacing-md) 0;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .seek-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            border-radius: var(--radius-lg);
+            transition: width 0.1s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .seek-handle {
+            position: absolute;
+            top: -6px;
+            width: 20px;
+            height: 20px;
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            border-radius: 50%;
+            cursor: pointer;
+            transform: translateX(-50%);
+            transition: all 0.1s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: var(--shadow-md);
+            border: 2px solid var(--bg-primary);
+        }
+        
+        .seek-handle:hover {
+            transform: translateX(-50%) scale(1.2);
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .time-display {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            margin-top: var(--spacing-md);
+            font-weight: 500;
+        }
+        
+        /* Speed Controls */
+        .speed-controls {
+            display: flex;
+            justify-content: center;
+            gap: var(--spacing-md);
+            margin-top: var(--spacing-xl);
+        }
+        
+        .speed-btn {
+            background: var(--bg-primary);
+            color: var(--text-secondary);
+            border: 1px solid var(--border-color);
+            padding: var(--spacing-sm) var(--spacing-md);
+            border-radius: var(--radius-lg);
+            cursor: pointer;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .speed-btn:hover {
+            background: var(--bg-secondary);
+            border-color: var(--primary-color);
+            transform: translateY(-1px);
+        }
+        
+        .speed-btn.active {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: var(--text-light);
+            border-color: var(--primary-color);
+            box-shadow: var(--shadow-md);
+        }
+        
+        /* File Info */
+        .file-info {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+            margin-top: var(--spacing-lg);
+            padding: var(--spacing-md);
+            background: var(--bg-secondary);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border-color);
+        }
+        
+        .file-icon {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, var(--error-color), #dc2626);
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-light);
+            font-size: 0.75rem;
+            font-weight: 700;
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .file-icon.pdf {
+            background: linear-gradient(135deg, var(--error-color), #dc2626);
+        }
+        
+        .file-icon.txt {
+            background: linear-gradient(135deg, var(--info-color), #2563eb);
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .container {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                width: 100%;
+                height: auto;
+                min-height: 200px;
+            }
+            
+            .main-content {
+                padding: var(--spacing-xl);
+            }
+            
+            .main-content h1 {
+                font-size: 2rem;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .main-content {
+                padding: var(--spacing-lg);
+            }
+            
+            .upload-section,
+            .status-container,
+            .audio-controls {
+                padding: var(--spacing-lg);
+            }
+            
+            .control-buttons {
+                gap: var(--spacing-md);
+            }
+            
+            .control-btn {
+                width: 50px;
+                height: 50px;
+                font-size: 1rem;
+            }
+            
+            .speed-controls {
+                flex-wrap: wrap;
+            }
+        }
+        
+        /* Animations */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        /* Scrollbar Styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: var(--bg-tertiary);
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: var(--border-color);
+            border-radius: var(--radius-lg);
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--text-muted);
+        }
     </style>
 </head>
 <body>
-    <h1>Human Voice Assistant Demo</h1>
-    <hr>
-    
-    <h2>PDF Reader Demo</h2>
-    <input type="file" id="pdfFile" accept=".pdf">
-    <button id="uploadPdfButton">Upload & Process PDF</button>
-    <button id="streamAudioButton" disabled>Stream Audio</button>
-    
-    <div class="log-container" style="margin-top: 20px;">
-        <h3>PDF Status:</h3>
-        <p id="pdfStatus">Awaiting file upload...</p>
-        <p><strong>File Name:</strong> <span id="uploadedFileName">...</span></p>
+    <div class="container">
+        <!-- Left Sidebar -->
+        <div class="sidebar">
+            <h2>📁 Uploaded Files</h2>
+            <button class="refresh-btn" id="refreshFilesBtn">🔄 Refresh Files</button>
+            <ul class="file-list" id="fileList">
+                <li class="no-files">No files uploaded yet</li>
+            </ul>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="main-content">
+            <h1>Human Voice Assistant Demo</h1>
+            
+            <div class="upload-section">
+                <h2>📤 Upload New File</h2>
+                <div class="file-input-container">
+                    <input type="file" id="pdfFile" accept=".pdf,.txt" class="file-input">
+                </div>
+                <button id="uploadPdfButton" class="upload-btn">Upload & Process File</button>
+                <button id="streamAudioButton" class="stream-btn" disabled>Stream Audio</button>
+            </div>
+            
+            <div class="status-container">
+                <h3>📊 File Status</h3>
+                <div class="status-text" id="pdfStatus">Awaiting file upload...</div>
+                
+                <!-- Progress Container -->
+                <div class="progress-container" id="progressContainer">
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill"></div>
+                    </div>
+                    <div class="progress-text" id="progressText">0% Complete</div>
+                </div>
+                
+                <!-- Current Sentence Display -->
+                <div class="current-sentence" id="currentSentence"></div>
+                
+                <!-- WebSocket Status -->
+                <div class="websocket-status" id="websocketStatus"></div>
+                
+                <!-- Audio Controls -->
+                <div class="audio-controls" id="audioControls">
+                    <h3>🎵 Audio Player</h3>
+                    
+                    <!-- Control Buttons -->
+                    <div class="control-buttons">
+                        <button class="control-btn" id="backwardBtn" title="Backward 10s">⏪</button>
+                        <button class="control-btn play" id="playPauseBtn" title="Play/Pause">▶️</button>
+                        <button class="control-btn stop" id="stopBtn" title="Stop">⏹️</button>
+                        <button class="control-btn" id="forwardBtn" title="Forward 10s">⏩</button>
+                    </div>
+                    
+                    <!-- Seek Bar -->
+                    <div class="seek-container">
+                        <div class="seek-bar" id="seekBar">
+                            <div class="seek-fill" id="seekFill"></div>
+                            <div class="seek-handle" id="seekHandle"></div>
+                        </div>
+                        <div class="time-display">
+                            <span id="currentTime">00:00</span>
+                            <span id="totalTime">00:00</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Speed Controls -->
+                    <div class="speed-controls">
+                        <button class="speed-btn" data-speed="0.5">0.5x</button>
+                        <button class="speed-btn active" data-speed="1.0">1.0x</button>
+                        <button class="speed-btn" data-speed="1.5">1.5x</button>
+                        <button class="speed-btn" data-speed="2.0">2.0x</button>
+                    </div>
+                </div>
+                
+                <div class="file-info" id="fileInfo" style="display: none;">
+                    <div class="file-icon" id="fileIcon">PDF</div>
+                    <span><strong>Selected File:</strong> <span id="uploadedFileName">...</span></span>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script>
         const API_URL = "http://localhost:8000";
 
-        // PDF functionality
+        // DOM elements
         const pdfFileEl = document.getElementById('pdfFile');
         const uploadPdfButton = document.getElementById('uploadPdfButton');
         const streamAudioButton = document.getElementById('streamAudioButton');
         const pdfStatusEl = document.getElementById('pdfStatus');
         const uploadedFileNameEl = document.getElementById('uploadedFileName');
+        const fileInfoEl = document.getElementById('fileInfo');
+        const fileIconEl = document.getElementById('fileIcon');
+        const fileListEl = document.getElementById('fileList');
+        const refreshFilesBtn = document.getElementById('refreshFilesBtn');
+        const progressContainer = document.getElementById('progressContainer');
+        const progressFill = document.getElementById('progressFill');
+        const progressText = document.getElementById('progressText');
+        const currentSentence = document.getElementById('currentSentence');
+        const websocketStatus = document.getElementById('websocketStatus');
+        const audioControls = document.getElementById('audioControls');
+        const playPauseBtn = document.getElementById('playPauseBtn');
+        const stopBtn = document.getElementById('stopBtn');
+        const backwardBtn = document.getElementById('backwardBtn');
+        const forwardBtn = document.getElementById('forwardBtn');
+        const seekBar = document.getElementById('seekBar');
+        const seekFill = document.getElementById('seekFill');
+        const seekHandle = document.getElementById('seekHandle');
+        const currentTimeEl = document.getElementById('currentTime');
+        const totalTimeEl = document.getElementById('totalTime');
+        const speedBtns = document.querySelectorAll('.speed-btn');
         
         let uploadedFileName = '';
+        let selectedFile = '';
+        let websocket = null;
+        let audioQueue = [];
+        let isPlaying = false;
+        let currentAudio = null;
+        let isPaused = false;
+        let currentSpeed = 1.0;
+        let totalDuration = 0;
+        let currentPosition = 0;
+        let seekUpdateInterval = null;
+        let allAudioChunks = [];
+        let currentChunkIndex = 0;
 
-        // Add event listener for PDF upload
-        if (uploadPdfButton) {
-            uploadPdfButton.addEventListener('click', async () => {
-                const file = pdfFileEl.files[0];
-                if (!file) {
-                    pdfStatusEl.textContent = "Please select a file first.";
-                    return;
-                }
-                
-                pdfStatusEl.textContent = "Uploading...";
-                
-                const formData = new FormData();
-                formData.append('file', file);
-                
-                try {
-                    const response = await fetch(`${API_URL}/upload_file/`, {
-                        method: 'POST',
-                        body: formData,
-                    });
-                    const result = await response.json();
-                    
-                    if (result.status === 'success') {
-                        uploadedFileName = result.file_name;
-                        pdfStatusEl.textContent = `File "${uploadedFileName}" uploaded successfully!`;
-                        uploadedFileNameEl.textContent = uploadedFileName;
-                        streamAudioButton.disabled = false;
-                    } else {
-                        pdfStatusEl.textContent = `Error: ${result.message}`;
-                        streamAudioButton.disabled = true;
-                    }
-                } catch (error) {
-                    pdfStatusEl.textContent = "An error occurred during upload.";
-                    console.error("Upload error:", error);
-                    streamAudioButton.disabled = true;
-                }
-            });
-        }
-
-        // Add event listener for audio streaming
-        if (streamAudioButton) {
-            streamAudioButton.addEventListener('click', async () => {
-                if (!uploadedFileName) {
-                    pdfStatusEl.textContent = "No file has been uploaded.";
-                    return;
-                }
-                
-                pdfStatusEl.textContent = "Streaming audio...";
-                streamAudioButton.disabled = true;
-                
-                try {
-                    const response = await fetch(`${API_URL}/stream_audio_from_file/`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ text: uploadedFileName }),
-                    });
-                    
-                    if (response.ok) {
-                        const audioBlob = await response.blob();
-                        const audioUrl = URL.createObjectURL(audioBlob);
-                        const audio = new Audio(audioUrl);
-                        audio.play();
-                        
-                        audio.onended = () => {
-                            pdfStatusEl.textContent = "Streaming complete.";
-                            streamAudioButton.disabled = false;
-                        };
-                    } else {
-                        const error = await response.json();
-                        pdfStatusEl.textContent = `Streaming error: ${error.message}`;
-                        streamAudioButton.disabled = false;
-                    }
-                } catch (error) {
-                    pdfStatusEl.textContent = "An error occurred during streaming.";
-                    console.error("Streaming error:", error);
-                    streamAudioButton.disabled = false;
-                }
-            });
-        }
-
-        // Debug logging to help troubleshoot
-        console.log('Page loaded, elements found:', {
-            uploadPdfButton: !!uploadPdfButton,
-            streamAudioButton: !!streamAudioButton
+        // Load files on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            loadFileList();
+            setupKeyboardShortcuts();
         });
+        
+        // Setup keyboard shortcuts
+        function setupKeyboardShortcuts() {
+            document.addEventListener('keydown', (event) => {
+                // Only handle shortcuts when audio controls are visible
+                if (audioControls.style.display === 'none') return;
+                
+                switch (event.code) {
+                    case 'Space':
+                        event.preventDefault();
+                        togglePlayPause();
+                        break;
+                    case 'ArrowLeft':
+                        event.preventDefault();
+                        seekAudio(-10);
+                        break;
+                    case 'ArrowRight':
+                        event.preventDefault();
+                        seekAudio(10);
+                        break;
+                    case 'Escape':
+                        event.preventDefault();
+                        stopAudio();
+                        break;
+                }
+            });
+        }
+
+        // Refresh files button
+        refreshFilesBtn.addEventListener('click', () => {
+            loadFileList();
+        });
+
+        // Load file list from server
+        async function loadFileList() {
+            try {
+                console.log('Loading file list...');
+                const response = await fetch(`${API_URL}/list_files/`);
+                console.log('Response status:', response.status);
+                const result = await response.json();
+                console.log('File list result:', result);
+                
+                if (result.status === 'success') {
+                    displayFileList(result.files);
+                } else {
+                    console.error('Failed to load files:', result.message);
+                }
+            } catch (error) {
+                console.error('Error loading files:', error);
+            }
+        }
+
+        // Display file list in sidebar
+        function displayFileList(files) {
+            console.log('Displaying files:', files);
+            if (files.length === 0) {
+                fileListEl.innerHTML = '<li class="no-files">No files uploaded yet</li>';
+                return;
+            }
+
+            fileListEl.innerHTML = files.map(file => {
+                const fileType = file.endsWith('.pdf') ? 'PDF' : 'TXT';
+                const iconClass = file.endsWith('.pdf') ? 'pdf' : 'txt';
+                const isSelected = file === selectedFile ? 'selected' : '';
+                
+                return `
+                    <li class="file-item ${isSelected}" data-filename="${file}">
+                        <div class="file-name">${file}</div>
+                        <div class="file-type">${fileType}</div>
+                    </li>
+                `;
+            }).join('');
+
+            // Add click event listeners to file items
+            document.querySelectorAll('.file-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    selectFile(item.dataset.filename);
+                });
+            });
+        }
+
+        // Select a file from the list
+        function selectFile(filename) {
+            selectedFile = filename;
+            uploadedFileName = filename;
+            
+            // Update UI
+            document.querySelectorAll('.file-item').forEach(item => {
+                item.classList.remove('selected');
+                if (item.dataset.filename === filename) {
+                    item.classList.add('selected');
+                }
+            });
+            
+            uploadedFileNameEl.textContent = filename;
+            fileInfoEl.style.display = 'flex';
+            
+            // Update file icon
+            const fileType = filename.endsWith('.pdf') ? 'PDF' : 'TXT';
+            const iconClass = filename.endsWith('.pdf') ? 'pdf' : 'txt';
+            fileIconEl.textContent = fileType;
+            fileIconEl.className = `file-icon ${iconClass}`;
+            
+            // Enable stream button
+            streamAudioButton.disabled = false;
+            
+            // Update status
+            pdfStatusEl.textContent = `File "${filename}" selected. Ready to stream audio.`;
+        }
+
+        // Upload functionality
+        uploadPdfButton.addEventListener('click', async () => {
+            const file = pdfFileEl.files[0];
+            if (!file) {
+                pdfStatusEl.textContent = "Please select a file first.";
+                return;
+            }
+            
+            pdfStatusEl.textContent = "Uploading...";
+            
+            const formData = new FormData();
+            formData.append('file', file);
+            
+            try {
+                const response = await fetch(`${API_URL}/upload_file/`, {
+                    method: 'POST',
+                    body: formData,
+                });
+                const result = await response.json();
+                
+                if (result.status === 'success') {
+                    uploadedFileName = result.file_name;
+                    pdfStatusEl.textContent = `File "${uploadedFileName}" uploaded successfully!`;
+                    console.log('File uploaded successfully:', uploadedFileName);
+                    
+                    // Clear file input
+                    pdfFileEl.value = '';
+                    
+                    // Reload file list
+                    console.log('Reloading file list...');
+                    loadFileList();
+                    
+                    // Select the newly uploaded file
+                    setTimeout(() => {
+                        selectFile(uploadedFileName);
+                    }, 100);
+                } else {
+                    pdfStatusEl.textContent = `Error: ${result.message}`;
+                    streamAudioButton.disabled = true;
+                    console.error('Upload failed:', result.message);
+                }
+            } catch (error) {
+                pdfStatusEl.textContent = "An error occurred during upload.";
+                console.error("Upload error:", error);
+                streamAudioButton.disabled = true;
+            }
+        });
+
+        // WebSocket streaming functionality
+        streamAudioButton.addEventListener('click', async () => {
+            if (!uploadedFileName) {
+                pdfStatusEl.textContent = "No file has been selected.";
+                return;
+            }
+            
+            // Reset UI
+            resetStreamingUI();
+            streamAudioButton.disabled = true;
+            pdfStatusEl.textContent = "Connecting to WebSocket...";
+            
+            try {
+                // Create WebSocket connection
+                const wsUrl = API_URL.replace('http', 'ws');
+                websocket = new WebSocket(`${wsUrl}/ws/stream_audio`);
+                
+                // Set connection timeout
+                const connectionTimeout = setTimeout(() => {
+                    if (websocket.readyState === WebSocket.CONNECTING) {
+                        websocket.close();
+                        pdfStatusEl.textContent = "Connection timeout. Please try again.";
+                        streamAudioButton.disabled = false;
+                    }
+                }, 10000); // 10 second timeout
+        
+                websocket.onopen = () => {
+                    clearTimeout(connectionTimeout);
+                    pdfStatusEl.textContent = "WebSocket connected. Starting audio stream...";
+                    // Send filename to start streaming
+                    websocket.send(JSON.stringify({ filename: uploadedFileName }));
+                };
+                
+                websocket.onmessage = (event) => {
+                    if (event.data instanceof Blob) {
+                        // Audio chunk received
+                        handleAudioChunk(event.data);
+                    } else {
+                        // Text message received
+                        handleWebSocketMessage(event.data);
+                    }
+                };
+                
+                websocket.onclose = () => {
+                    console.log('WebSocket connection closed');
+                    streamAudioButton.disabled = false;
+                };
+                
+                websocket.onerror = (error) => {
+                    console.error('WebSocket error:', error);
+                    pdfStatusEl.textContent = "WebSocket connection error.";
+                    streamAudioButton.disabled = false;
+                };
+                
+            } catch (error) {
+                pdfStatusEl.textContent = "Failed to establish WebSocket connection.";
+                console.error("WebSocket error:", error);
+                streamAudioButton.disabled = false;
+            }
+        });
+        
+        // Handle WebSocket text messages
+        function handleWebSocketMessage(data) {
+            try {
+                const message = JSON.parse(data);
+                console.log('WebSocket message:', message);
+                
+                switch (message.status) {
+                    case 'start':
+                        websocketStatus.textContent = message.message;
+                        websocketStatus.style.display = 'block';
+                        audioControls.style.display = 'block';
+                        break;
+                        
+                    case 'info':
+                        websocketStatus.textContent = `Processing ${message.total_sentences} sentences...`;
+                        break;
+                        
+                    case 'progress':
+                        updateProgress(message.current, message.total, message.sentence);
+                        break;
+                        
+                    case 'audio_chunk':
+                        websocketStatus.textContent = `Received audio chunk ${message.chunk_index + 1}/${message.total_sentences}`;
+                        break;
+                        
+                    case 'complete':
+                        websocketStatus.textContent = message.message;
+                        websocketStatus.style.display = 'block';
+                        setTimeout(() => {
+                            websocketStatus.style.display = 'none';
+                            streamAudioButton.disabled = false;
+                        }, 2000);
+                        break;
+                        
+                    case 'error':
+                        websocketStatus.textContent = `Error: ${message.message}`;
+                        websocketStatus.style.display = 'block';
+                        streamAudioButton.disabled = false;
+                        audioControls.style.display = 'none';
+                        break;
+                }
+            } catch (error) {
+                console.error('Error parsing WebSocket message:', error);
+            }
+        }
+        
+        // Handle audio chunk
+        function handleAudioChunk(audioBlob) {
+            // Add to audio queue and store all chunks
+            audioQueue.push(audioBlob);
+            allAudioChunks.push(audioBlob);
+            
+            // Start playing if not already playing
+            if (!isPlaying) {
+                playNextAudioChunk();
+            }
+        }
+        
+        // Play next audio chunk from queue
+        function playNextAudioChunk() {
+            if (audioQueue.length === 0) {
+                isPlaying = false;
+                return;
+            }
+            
+            isPlaying = true;
+            const audioBlob = audioQueue.shift();
+            const audioUrl = URL.createObjectURL(audioBlob);
+            const audio = new Audio(audioUrl);
+            
+            // Set playback speed
+            audio.playbackRate = currentSpeed;
+            
+            // Store current audio for controls
+            currentAudio = audio;
+            isPaused = false;
+            
+            // Update UI
+            updatePlayPauseButton();
+            startSeekUpdates();
+            
+            audio.onloadedmetadata = () => {
+                updateSeekBar(currentChunkIndex / allAudioChunks.length);
+            };
+            
+            audio.onended = () => {
+                // Move to next chunk
+                currentChunkIndex++;
+                playNextAudioChunk();
+            };
+            
+            audio.onerror = () => {
+                console.error('Audio playback error');
+                currentChunkIndex++;
+                playNextAudioChunk();
+            };
+            
+            audio.play();
+        }
+        
+        // Update progress bar
+        function updateProgress(current, total, sentence) {
+            const percentage = Math.round((current / total) * 100);
+            progressFill.style.width = percentage + '%';
+            progressText.textContent = `${percentage}% Complete (${current}/${total})`;
+            currentSentence.textContent = `Current: ${sentence}`;
+            
+            progressContainer.style.display = 'block';
+            currentSentence.style.display = 'block';
+        }
+        
+        // Reset streaming UI
+        function resetStreamingUI() {
+            progressContainer.style.display = 'none';
+            currentSentence.style.display = 'none';
+            websocketStatus.style.display = 'none';
+            audioControls.style.display = 'none';
+            progressFill.style.width = '0%';
+            progressText.textContent = '0% Complete';
+            audioQueue = [];
+            isPlaying = false;
+            isPaused = false;
+            currentAudio = null;
+            totalDuration = 0;
+            currentPosition = 0;
+            allAudioChunks = [];
+            currentChunkIndex = 0;
+            
+            if (websocket) {
+                websocket.close();
+                websocket = null;
+            }
+            
+            if (seekUpdateInterval) {
+                clearInterval(seekUpdateInterval);
+                seekUpdateInterval = null;
+            }
+            
+            updatePlayPauseButton();
+            updateSeekBar(0);
+        }
+        
+        // Audio Control Event Listeners
+        playPauseBtn.addEventListener('click', togglePlayPause);
+        stopBtn.addEventListener('click', stopAudio);
+        backwardBtn.addEventListener('click', () => seekAudio(-10));
+        forwardBtn.addEventListener('click', () => seekAudio(10));
+        
+        // Seek bar event listeners
+        seekBar.addEventListener('click', handleSeekClick);
+        seekHandle.addEventListener('mousedown', startSeekDrag);
+        
+        // Speed control event listeners
+        speedBtns.forEach(btn => {
+            btn.addEventListener('click', () => changePlaybackSpeed(parseFloat(btn.dataset.speed)));
+        });
+        
+        // Toggle play/pause
+        function togglePlayPause() {
+            if (!currentAudio) return;
+            
+            if (isPaused) {
+                currentAudio.play();
+                isPaused = false;
+            } else {
+                currentAudio.pause();
+                isPaused = true;
+            }
+            
+            updatePlayPauseButton();
+        }
+        
+        // Stop audio
+        function stopAudio() {
+            if (currentAudio) {
+                currentAudio.pause();
+                currentAudio.currentTime = 0;
+            }
+            
+            isPlaying = false;
+            isPaused = false;
+            currentAudio = null;
+            audioQueue = [];
+            allAudioChunks = [];
+            currentChunkIndex = 0;
+            totalDuration = 0;
+            currentPosition = 0;
+            
+            updatePlayPauseButton();
+            updateSeekBar(0);
+            
+            if (websocket) {
+                websocket.close();
+                websocket = null;
+            }
+            
+            audioControls.style.display = 'none';
+            streamAudioButton.disabled = false;
+        }
+        
+        // Seek audio by seconds (chunk-based)
+        function seekAudio(seconds) {
+            if (!currentAudio || allAudioChunks.length === 0) return;
+            
+            // For now, implement simple forward/backward by chunks
+            if (seconds > 0) {
+                // Forward - skip to next chunk
+                if (currentChunkIndex < allAudioChunks.length - 1) {
+                    currentChunkIndex++;
+                    restartFromChunk(currentChunkIndex);
+                }
+            } else {
+                // Backward - go to previous chunk
+                if (currentChunkIndex > 0) {
+                    currentChunkIndex--;
+                    restartFromChunk(currentChunkIndex);
+                }
+            }
+        }
+        
+        // Restart playback from specific chunk
+        function restartFromChunk(chunkIndex) {
+            if (currentAudio) {
+                currentAudio.pause();
+            }
+            
+            // Clear current queue and restart from chunk
+            audioQueue = allAudioChunks.slice(chunkIndex);
+            currentChunkIndex = chunkIndex;
+            
+            if (audioQueue.length > 0) {
+                playNextAudioChunk();
+            }
+        }
+        
+        // Handle seek bar click (chunk-based)
+        function handleSeekClick(event) {
+            if (!currentAudio || allAudioChunks.length === 0) return;
+            
+            const rect = seekBar.getBoundingClientRect();
+            const clickX = event.clientX - rect.left;
+            const percentage = clickX / rect.width;
+            
+            // Calculate which chunk to jump to
+            const targetChunk = Math.floor(percentage * allAudioChunks.length);
+            const clampedChunk = Math.max(0, Math.min(targetChunk, allAudioChunks.length - 1));
+            
+            restartFromChunk(clampedChunk);
+            updateSeekBar(clampedChunk / allAudioChunks.length);
+        }
+        
+        // Start seek drag (chunk-based)
+        function startSeekDrag(event) {
+            if (!currentAudio || allAudioChunks.length === 0) return;
+            
+            const handleDrag = (e) => {
+                const rect = seekBar.getBoundingClientRect();
+                const clickX = Math.max(0, Math.min(e.clientX - rect.left, rect.width));
+                const percentage = clickX / rect.width;
+                
+                // Calculate which chunk to jump to
+                const targetChunk = Math.floor(percentage * allAudioChunks.length);
+                const clampedChunk = Math.max(0, Math.min(targetChunk, allAudioChunks.length - 1));
+                
+                updateSeekBar(clampedChunk / allAudioChunks.length);
+            };
+            
+            const stopDrag = () => {
+                document.removeEventListener('mousemove', handleDrag);
+                document.removeEventListener('mouseup', stopDrag);
+                
+                // Apply the seek when drag ends
+                const rect = seekBar.getBoundingClientRect();
+                const clickX = Math.max(0, Math.min(event.clientX - rect.left, rect.width));
+                const percentage = clickX / rect.width;
+                const targetChunk = Math.floor(percentage * allAudioChunks.length);
+                const clampedChunk = Math.max(0, Math.min(targetChunk, allAudioChunks.length - 1));
+                
+                restartFromChunk(clampedChunk);
+            };
+            
+            document.addEventListener('mousemove', handleDrag);
+            document.addEventListener('mouseup', stopDrag);
+        }
+        
+        // Change playback speed
+        function changePlaybackSpeed(speed) {
+            currentSpeed = speed;
+            
+            if (currentAudio) {
+                currentAudio.playbackRate = speed;
+            }
+            
+            // Update speed button states
+            speedBtns.forEach(btn => {
+                btn.classList.remove('active');
+                if (parseFloat(btn.dataset.speed) === speed) {
+                    btn.classList.add('active');
+                }
+            });
+        }
+        
+        // Update play/pause button
+        function updatePlayPauseButton() {
+            if (isPaused) {
+                playPauseBtn.innerHTML = '▶️';
+                playPauseBtn.className = 'control-btn play';
+                playPauseBtn.title = 'Play';
+            } else {
+                playPauseBtn.innerHTML = '⏸️';
+                playPauseBtn.className = 'control-btn pause';
+                playPauseBtn.title = 'Pause';
+            }
+        }
+        
+        // Update seek bar (chunk-based)
+        function updateSeekBar(percentage) {
+            percentage = Math.max(0, Math.min(1, percentage));
+            seekFill.style.width = (percentage * 100) + '%';
+            seekHandle.style.left = (percentage * 100) + '%';
+            
+            // Update time display based on chunks
+            if (allAudioChunks.length > 0) {
+                const currentChunk = Math.floor(percentage * allAudioChunks.length);
+                const totalChunks = allAudioChunks.length;
+                
+                currentTimeEl.textContent = `Chunk ${currentChunk + 1}`;
+                totalTimeEl.textContent = `of ${totalChunks}`;
+            } else {
+                currentTimeEl.textContent = '00:00';
+                totalTimeEl.textContent = '00:00';
+            }
+        }
+        
+        // Format time as MM:SS
+        function formatTime(seconds) {
+            if (isNaN(seconds)) return '00:00';
+            
+            const mins = Math.floor(seconds / 60);
+            const secs = Math.floor(seconds % 60);
+            return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+        }
+        
+        // Start seek bar updates (chunk-based)
+        function startSeekUpdates() {
+            if (seekUpdateInterval) {
+                clearInterval(seekUpdateInterval);
+            }
+            
+            seekUpdateInterval = setInterval(() => {
+                if (currentAudio && !isPaused && allAudioChunks.length > 0) {
+                    // Update based on current chunk progress
+                    const currentChunkProgress = currentChunkIndex / allAudioChunks.length;
+                    updateSeekBar(currentChunkProgress);
+                }
+            }, 100);
+        }
+        
+        // Stop seek bar updates
+        function stopSeekUpdates() {
+            if (seekUpdateInterval) {
+                clearInterval(seekUpdateInterval);
+                seekUpdateInterval = null;
+            }
+        }
     </script>
 </body>
 </html>

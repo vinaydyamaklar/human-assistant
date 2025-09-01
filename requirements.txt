@@ -9,3 +9,4 @@ gtts
 soundfile
 numpy
 PyPDF2
+websockets
